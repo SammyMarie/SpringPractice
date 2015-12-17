@@ -1,0 +1,76 @@
+buildscript{
+    dependencies{
+        repositories {
+            jcenter{url "http://jcenter.bintray.com"}
+        }
+        classpath 'mysql:mysql-connector-java:5.1.37'
+        classpath 'org.flywaydb:flyway-gradle-plugin:3.2.1'
+        classpath 'com.bmuschko:gradle-tomcat-plugin:2.2.3'
+        classpath 'org.hidetake:gradle-ssh-plugin:0.3.1'
+        classpath 'org.gradle.api.plugins:gradle-cargo-plugin:1.5'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'org.flywaydb.flyway'
+apply plugin: 'com.bmuschko.tomcat'
+apply plugin: 'ssh'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter{url "http://jcenter.bintray.com"}
+}
+
+project.ext {
+    artifact = "SpringPractice"
+    majorVersion = "1"
+    minorVersion = "0"
+    version = majorVersion + '.' + minorVersion + '-SNAPSHOT'
+    context = artifact + '-v' + majorVersion
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile 'org.springframework:spring-webmvc:4.2.3.RELEASE'
+    compile 'mysql:mysql-connector-java:5.1.37'
+    compile 'org.springframework:spring-test:2.5'
+    compile 'org.mockito:mockito-all:1.9.5'
+    compile 'javax.servlet:javax.servlet-api:3.0.1'
+    compile 'javax.servlet:jstl:1.2'
+    compile 'org.springframework:spring-jdbc:4.2.2.RELEASE'
+    compile 'org.springframework:spring-dao:2.0.8'
+    compile 'org.yaml:snakeyaml:1.16'
+    compile 'org.dbunit:dbunit:2.5.1'
+
+    tomcat 'org.apache.tomcat.embed:tomcat-embed-core:8.0.28'
+    tomcat 'org.apache.tomcat.embed:tomcat-embed-logging-juli:8.0.28'
+    tomcat 'org.apache.tomcat.embed:tomcat-embed-jasper:8.0.28'
+}
+
+task flywayConfigure << {
+    Properties localProperties = new Properties()
+    localProperties.load(new FileInputStream("config/local.properties"))
+    project.ext['flyway.user'] = localProperties['flyway.username']
+    project.ext['flyway.password'] = localProperties['flyway.password']
+    project.ext['flyway.url'] = localProperties['jdbc.url']
+}
+
+flywayClean{
+    dependsOn flywayConfigure
+}
+
+flywayMigrate{
+    dependsOn flywayConfigure
+}
+
+task wrapper(type : Wrapper){
+    gradleVersion = '2.9'
+}
+
+war{
+    webInf{ from 'web/WEB-INF'}
+}
