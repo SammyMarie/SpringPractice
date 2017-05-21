@@ -5,4 +5,5 @@ jdk:
 before_install:
   - chmod a+x gradlew
 
-script: ./gradlew build
+script:
+  ./gradlew build

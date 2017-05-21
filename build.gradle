@@ -34,7 +34,8 @@ project.ext {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile 'junit:junit:4.12'
+
     compile 'org.springframework:spring-webmvc:4.2.3.RELEASE'
     compile 'mysql:mysql-connector-java:5.1.37'
     compile 'org.springframework:spring-test:2.5'
@@ -68,7 +69,7 @@ flywayMigrate{
 }
 
 task wrapper(type : Wrapper){
-    gradleVersion = '2.9'
+    gradleVersion = '3.5'
 }
 
 war{
